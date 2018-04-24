@@ -1,5 +1,13 @@
 Description: Deploys an Auto Scaling Group of webservers with a load balancer
+
 Parameters:
+  Environment:
+    Description: Depicts the environment to be deployed with a stack
+    Type: String
+    AllowedValues:
+      - dev
+      - live
+    Default: dev
   DesiredCapacity:
     Description: desired capacity of webservers in the auto scaling group
     Type: Number
@@ -10,6 +18,10 @@ Parameters:
   PublicSubnetTwoId:
     Description: A public subnet Id to use for the load balancer, in a different availability zone
     Type: AWS::EC2::Subnet::Id
+
+
+Conditions:
+  IsLiveEnvironment: !Equals [ !Ref Environment, live ]
 
 
 Resources:
@@ -48,8 +60,8 @@ Resources:
       LaunchConfigurationName: !Ref launchConfiguration
       LoadBalancerNames:
         - !Ref loadBalancer
-      MaxSize: !Ref DesiredCapacity
-      MinSize: 0
+      MaxSize: !If [ IsLiveEnvironment, 4, 2 ]
+      MinSize: !If [ IsLiveEnvironment, 2, 0 ]
       VPCZoneIdentifier:
         - !Ref PublicSubnetOneId
         - !Ref PublicSubnetTwoId
@@ -69,8 +81,8 @@ Resources:
                 enabled: true
                 ensureRunning: true
     Properties:
-      ImageId: ami-467ca739
-      InstanceType: m4.large
+      ImageId: ami-7c87d913
+      InstanceType: t2.micro
       SecurityGroups:
         - !Sub ${securityGroup.GroupId}
       UserData:
