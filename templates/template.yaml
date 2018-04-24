@@ -1,5 +1,4 @@
 Description: Deploys an Auto Scaling Group of webservers with a load balancer
-
 Parameters:
   DesiredCapacity:
     Description: desired capacity of webservers in the auto scaling group
@@ -71,7 +70,7 @@ Resources:
                 ensureRunning: true
     Properties:
       ImageId: ami-467ca739
-      InstanceType: t2.micro
+      InstanceType: m4.large
       SecurityGroups:
         - !Sub ${securityGroup.GroupId}
       UserData:
